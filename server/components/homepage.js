@@ -43,18 +43,8 @@ var ServiceDashboardClass = React.createClass({
         p({className: 'count'}, this.state.services.length + this.state.serviceGroups.length)),
       div(null,
         p(null ,'Services providing regularly updated, detailed data to GOV.UK'),
-        div({className: 'service-listing'},
-          ul({children: firstHalf.map(function(service) {
-              return li(null,
-                a({ href: '/performance/' + service.slug}, service.title));
-          })
-        })),
-        div({className: 'service-listing'},
-          ul({children: secondHalf.map(function(service) {
-              return li(null,
-                a({ href: '/performance/' + service.slug}, service.title));
-          })}),
-          dl(null,
+        ServiceListComponent({items: firstHalf}),
+        ServiceListComponent({items: secondHalf, sibling: dl(null,
             dt({className: 'service_groups'}, 'Service Groups'),
             dl(null,
               ol({children: this.state.serviceGroups.map(function (service) {
@@ -63,7 +53,7 @@ var ServiceDashboardClass = React.createClass({
               })})
             )
           )
-        )
+        })
       )
     );
   },
@@ -143,18 +133,8 @@ var ActivityDashboardClass = React.createClass({
           )
         ),
         h3({className: 'underline'}, 'Department activity dashboards'),
-        div({className: 'service-listing'},
-          ul({children: firstHalf.map(function(service) {
-              return li(null,
-                a({ href: '/performance/' + service.slug}, service.title));
-          })
-        })),
-        div({className: 'service-listing'},
-          ul({children: secondHalf.map(function(service) {
-              return li(null,
-                a({ href: '/performance/' + service.slug}, service.title));
-          })})
-        )
+        ServiceListComponent({items: firstHalf}),
+        ServiceListComponent({items: secondHalf})
       )
     );
   }
@@ -167,3 +147,33 @@ exports.ActivityDashboard = function (contentDashboards) {
     contentDashboards: contentDashboards
   }));
 };
+
+var ServiceListClass = React.createClass({
+  getInitialState: function() {
+    return {
+      items: this.props.items,
+      sibling: this.props.sibling
+    };
+  },
+
+  render: function() {
+    var sibling = this.state.sibling;
+
+    if (sibling) {
+      return div({className: 'service-listing'},
+        ul({children: this.state.items.map(function(service) {
+            return li(null,
+              a({ href: '/performance/' + service.slug}, service.title));
+        })}),
+        sibling);
+    } else {
+      return div({className: 'service-listing'},
+        ul({children: this.state.items.map(function(service) {
+            return li(null,
+              a({ href: '/performance/' + service.slug}, service.title));
+        })}));
+    }
+  }
+});
+
+var ServiceListComponent = React.createFactory(ServiceListClass);
