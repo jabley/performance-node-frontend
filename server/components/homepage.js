@@ -110,3 +110,60 @@ exports.OverviewDashboard = function (highVolumeServices) {
     highVolumeServices: highVolumeServices
   }));
 }
+
+var ActivityDashboardClass = React.createClass({
+
+  // We initialise its state by using the `props` that were passed in when it
+  // was first rendered.
+  getInitialState: function() {
+    return {
+      contentDashboards: this.props.contentDashboards
+    }
+  },
+
+  render: function() {
+    var midPoint = Math.ceil(this.state.contentDashboards.length / 2);
+    var firstHalf = this.state.contentDashboards.filter(function (dashboard, i) {
+      return (i + 1) <= midPoint;
+    });
+    var secondHalf = this.state.contentDashboards.filter(function (dashboard, i) {
+      return (i + 1) > midPoint;
+    });
+    return section({id: 'activity-dashboards'},
+      h2(null, 'GOV.UK activity dashboards'),
+      div({className:'cols3 service-listing'},
+        h3(null, 'Activity dashboards'),
+        p({className: 'count'}, this.state.contentDashboards.length + 1)
+      ),
+      div({className: 'cols3 add3'},
+        p(null, 'Web traffic on our site, including a look at how our content is being used.'),
+        p(null,
+          a({href:'/performance/site-activity'},
+            strong(null, 'GOV.UK site activity overview')
+          )
+        ),
+        h3({className: 'underline'}, 'Department activity dashboards'),
+        div({className: 'service-listing'},
+          ul({children: firstHalf.map(function(service) {
+              return li(null,
+                a({ href: '/performance/' + service.slug}, service.title));
+          })
+        })),
+        div({className: 'service-listing'},
+          ul({children: secondHalf.map(function(service) {
+              return li(null,
+                a({ href: '/performance/' + service.slug}, service.title));
+          })})
+        )
+      )
+    );
+  }
+});
+
+var ActivityDashboardComponent = React.createFactory(ActivityDashboardClass);
+
+exports.ActivityDashboard = function (contentDashboards) {
+  return React.renderToStaticMarkup(ActivityDashboardComponent({
+    contentDashboards: contentDashboards
+  }));
+};

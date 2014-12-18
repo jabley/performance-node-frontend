@@ -36,7 +36,7 @@ app.get('/performance', function (req, res) {
         dashboardType(['content'])
       ).filter(function(d) {
         return d['slug'] !== 'site-activity';
-      }).sort(serviceSort);;
+      }).sort(serviceSort);
 
       var services = dashboards.filter(dashboardType(['transaction', 'other'])).sort(serviceSort);
       var serviceGroups = dashboards.filter(dashboardType(['service-group'])).sort(serviceSort);;
@@ -52,7 +52,8 @@ app.get('/performance', function (req, res) {
         pageTitle: 'GOV.UK – Performance',
         content: Mustache.render(contentTemplate, {
           serviceDashboard: dashboardComponents.ServiceDashboard(services, serviceGroups),
-          overviewDashboard: dashboardComponents.OverviewDashboard(highVolumeServices)
+          overviewDashboard: dashboardComponents.OverviewDashboard(highVolumeServices),
+          activityDashboard: dashboardComponents.ActivityDashboard(contentDashboards)
         })
       }));
     });
