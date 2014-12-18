@@ -23,51 +23,6 @@
   {{{ activityDashboard }}}
   {{{ transactionsExplorer }}}
 
-  <section id="service-dashboards">
-    <h2>Service dashboards</h2>
-    <div class="cols3 service-listing">
-      <h3>Detailed dashboards</h3>
-      <p class="count"><!-- services.length + serviceGroups.length --></p>
-    </div>
-    <div class="cols3 add3">
-      <p>Services providing regularly updated, detailed data to GOV.UK</p>
-      <div class="cols2 service-listing">
-        <ul>
-          <% _.each(services, function (service, i) { %>
-            <li><a href="/performance/<%= service.slug %>"><%= service.title %></a></li>
-            <% if (i + 1 === Math.ceil((services.length + serviceGroups.length) / 2)) { %>
-              </ul>
-            </div>
-            <div class="cols2 service-listing">
-              <ul>
-            <% } %>
-          <% }); %>
-        </ul>
-        <% if (serviceGroups.length) { %>
-          <dl>
-            <dt class="service_groups">Service groups</dt>
-            <dd>
-              <ol>
-                <% _.each(serviceGroups, function (service, i) { %>
-                  <li><a href="/performance/<%= service.slug %>"><%= service.title %></a></li>
-                <% }); %>
-              </ol>
-            </dd>
-          </dl>
-        <% } %>
-      </div>
-    </div>
-  </section>
-  <section id="overview-dashboards">
-    <div class="cols3 service-listing">
-      <h3>Overview dashboards</h3>
-      <p class="count"><%= highVolumeServices.length %></p>
-    </div>
-    <div class="cols3 add3">
-      <p>Services providing quarterly data to GOV.UK</p>
-      <p><a href="/performance/services"><strong>View all services</strong></a></p>
-    </div>
-  </section>
   <section id="activity-dashboards">
     <h2>GOV.UK activity dashboards</h2>
     <div class="cols3 service-listing">

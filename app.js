@@ -51,7 +51,8 @@ app.get('/performance', function (req, res) {
         assetPath: '/assets/',
         pageTitle: 'GOV.UK – Performance',
         content: Mustache.render(contentTemplate, {
-          serviceDashboard: dashboardComponents.ServiceDashboard(services, serviceGroups)
+          serviceDashboard: dashboardComponents.ServiceDashboard(services, serviceGroups),
+          overviewDashboard: dashboardComponents.OverviewDashboard(highVolumeServices)
         })
       }));
     });

@@ -11,7 +11,8 @@ var React = require('react'),
   dt = DOM.dt,
   dl = DOM.dl,
   dd = DOM.dd,
-  ol = DOM.ol;
+  ol = DOM.ol
+  strong = DOM.strong;
 
 var ServiceDashboardClass = React.createClass({
   // We initialise its state by using the `props` that were passed in when it
@@ -76,3 +77,36 @@ exports.ServiceDashboard = function (services, serviceGroups) {
     serviceGroups: serviceGroups
   }));
 };
+
+var OverviewDashboardClass = React.createClass({
+
+  // We initialise its state by using the `props` that were passed in when it
+  // was first rendered.
+  getInitialState: function() {
+    return {
+      highVolumeServices: this.props.highVolumeServices
+    }
+  },
+
+  // For ease of illustration, we just use the React JS methods directly
+  // (no JSX compilation needed)
+  render: function() {
+    return section({id: 'overview-dashboards'},
+        div({className: 'service-listing'},
+          h3(null, 'Overview dashboards'),
+          p({className: 'count'}, this.state.highVolumeServices.length)),
+        div(null,
+          p(null, 'Services providing quarterly data to GOV.UK'),
+          p(null,
+            a({href: '/performance/services'}, strong(null, 'View all services'))))
+      );
+  }
+});
+
+var OverviewDashboardComponent = React.createFactory(OverviewDashboardClass);
+
+exports.OverviewDashboard = function (highVolumeServices) {
+  return React.renderToStaticMarkup(OverviewDashboardComponent({
+    highVolumeServices: highVolumeServices
+  }));
+}
