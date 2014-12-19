@@ -78,6 +78,18 @@ function loadTemplate(path) {
   });
 }
 
+app.get('/performance/services', function (req, res) {
+  var layoutTemplate = loadTemplate(__dirname + '/node_modules/govuk_template_mustache/views/layouts/govuk_template.html');
+  var contentTemplate = loadTemplate(__dirname + '/server/templates/services.html');
+
+  res.send(Mustache.render(layoutTemplate, {
+    assetPath: '/assets/',
+    pageTitle: 'GOV.UK – Performance',
+    content: Mustache.render(contentTemplate, {
+    })
+  }));
+});
+
 app.get('/performance/*', function (req, res) {
   res.send("Dashboard template"); 
 });
