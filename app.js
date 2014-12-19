@@ -24,7 +24,7 @@ app.get('/assets/*', function (req, res) {
 
 app.get('/performance', function (req, res) {
   // Fetch meta data
-  var client = https.get('https://stagecraft.preview.performance.service.gov.uk/public/dashboards', function(sRes) {
+  https.get('https://stagecraft.preview.performance.service.gov.uk' + '/public/dashboards', function(sRes) {
     var data = '';
     sRes.on('data', function(chunk) {
       data += chunk;
@@ -91,7 +91,29 @@ app.get('/performance/services', function (req, res) {
 });
 
 app.get('/performance/*', function (req, res) {
-  res.send("Dashboard template"); 
+  var dashboardSlug = req.path.substring('/performance/'.length);
+
+  https.get('https://stagecraft.preview.performance.service.gov.uk' + '/public/dashboards?slug=' + dashboardSlug, function(sRes) {
+    var data = '';
+    sRes.on('data', function(chunk) {
+      data += chunk;
+    }).on('end', function() {
+      // parse meta data
+      var dashboard = JSON.parse(data);
+
+      // render content
+      var layoutTemplate = loadTemplate(__dirname + '/node_modules/govuk_template_mustache/views/layouts/govuk_template.html');
+      var contentTemplate = loadTemplate(__dirname + '/server/templates/dashboard.html');
+      res.send(Mustache.render(layoutTemplate, {
+        assetPath: '/assets/',
+        pageTitle: 'GOV.UK – Performance',
+        content: Mustache.render(contentTemplate, {
+        })
+      }));
+    });
+  }).on('error', function(e) {
+    res.status(500);
+  });
 });
 
 var server = app.listen(3000, function () {
