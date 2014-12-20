@@ -8,7 +8,7 @@
     "govuk_frontend_toolkit": "^3.1.0",
     "govuk_template_mustache": "^0.12.0",
     "mustache": "^0.8.2",
-    "react": "^0.12.1"
+    "performanceplatform-client.js": "0.0.1",
     "q": "^1.1.2",
     "react": "^0.12.1",
     "request": "^2.51.0"

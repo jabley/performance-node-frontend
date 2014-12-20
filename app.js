@@ -1,4 +1,5 @@
-var Mustache = require('mustache'),
+var Mustache = require('mustache')
+  Dashboard = require('performanceplatform-client.js'),
   express = require('express'),
   fs = require('fs'),
   request = require('request')
@@ -73,39 +74,24 @@ function loadTemplate(path) {
 }
 
 app.get('/performance/services', function (req, res) {
-  var layoutTemplate = loadTemplate(__dirname + '/node_modules/govuk_template_mustache/views/layouts/govuk_template.html');
-  var contentTemplate = loadTemplate(__dirname + '/server/templates/services.html');
-
-  res.send(Mustache.render(layoutTemplate, {
-    assetPath: '/assets/',
-    pageTitle: 'GOV.UK – Performance',
-    content: Mustache.render(contentTemplate, {
-    })
-  }));
+  render(res, '/server/templates/services.html');
 });
 
 app.get('/performance/*', function (req, res) {
-  var dashboardSlug = req.path.substring('/performance/'.length);
+  new Dashboard().getConfig(req.path.substring('/performance/'.length))
+  .then(function (dashboardConfig) {
+    return JSON.parse(dashboardConfig);
+  })
+  .then(function (dashboard) {
+    var dashboardComponents = require('server/components/dashboard');
 
-  https.get('https://stagecraft.preview.performance.service.gov.uk' + '/public/dashboards?slug=' + dashboardSlug, function(sRes) {
-    var data = '';
-    sRes.on('data', function(chunk) {
-      data += chunk;
-    }).on('end', function() {
-      // parse meta data
-      var dashboard = JSON.parse(data);
-
-      // render content
-      var layoutTemplate = loadTemplate(__dirname + '/node_modules/govuk_template_mustache/views/layouts/govuk_template.html');
-      var contentTemplate = loadTemplate(__dirname + '/server/templates/dashboard.html');
-      res.send(Mustache.render(layoutTemplate, {
-        assetPath: '/assets/',
-        pageTitle: 'GOV.UK – Performance',
-        content: Mustache.render(contentTemplate, {
-        })
-      }));
+    //render the template
+    render(res, '/server/templates/dashboard.html', {
+      dashboardHeading: dashboardComponents.DashboardHeading(dashboard)
     });
-  }).on('error', function(e) {
+  })
+  .catch(function (error) {
+    console.log(error);
     res.status(500);
   });
 });
