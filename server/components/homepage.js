@@ -14,6 +14,19 @@ var React = require('react'),
   ol = DOM.ol
   strong = DOM.strong;
 
+function partition(list, predicate) {
+  var groups = {yes: [], no: []};
+  for(var i = 0, len = list.length; i < len; i++) {
+    var item = list[i];
+    if (predicate(item, i)) {
+      groups.yes.push(item);
+    } else {
+      groups.no.push(item);
+    }
+  }
+  return [groups.yes, groups.no];
+}
+
 var ServiceDashboardClass = React.createClass({
   // We initialise its state by using the `props` that were passed in when it
   // was first rendered.
@@ -29,12 +42,12 @@ var ServiceDashboardClass = React.createClass({
   render: function() {
     var midPoint = Math.ceil((this.state.services.length + this.state.serviceGroups.length) / 2);
 
-    var firstHalf = this.state.services.filter(function(service, i) {
+    var groups = partition(this.state.services, function(service, i) {
       return (i + 1) <= midPoint;
     });
-    var secondHalf = this.state.services.filter(function(service, i) {
-      return (i + 1) > midPoint;
-    });
+
+    var firstHalf = groups[0],
+        secondHalf = groups[1];
 
     return section({id: 'service-dashboards'}, 
       h2(null, 'Service dashboards'),
@@ -113,12 +126,14 @@ var ActivityDashboardClass = React.createClass({
 
   render: function() {
     var midPoint = Math.ceil(this.state.contentDashboards.length / 2);
-    var firstHalf = this.state.contentDashboards.filter(function (dashboard, i) {
+
+    var groups = partition(this.state.contentDashboards, function (dashboard, i) {
       return (i + 1) <= midPoint;
     });
-    var secondHalf = this.state.contentDashboards.filter(function (dashboard, i) {
-      return (i + 1) > midPoint;
-    });
+
+    var firstHalf = groups[0],
+      secondHalf = groups[1];
+
     return section({id: 'activity-dashboards'},
       h2(null, 'GOV.UK activity dashboards'),
       div({className:'cols3 service-listing'},

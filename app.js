@@ -1,7 +1,8 @@
 var Mustache = require('mustache'),
   express = require('express'),
   fs = require('fs'),
-  https = require('https'),
+  request = require('request')
+  Q = require('q'),
   $ = require('jquery');
 
 var app = express();
@@ -24,40 +25,33 @@ app.get('/assets/*', function (req, res) {
 
 app.get('/performance', function (req, res) {
   // Fetch meta data
-  https.get('https://stagecraft.preview.performance.service.gov.uk' + '/public/dashboards', function(sRes) {
-    var data = '';
-    sRes.on('data', function(chunk) {
-      data += chunk;
-    }).on('end', function() {
-      // parse meta data
-      var dashboards = JSON.parse(data)['items'];
+  requestPromise({
+    url: 'https://stagecraft.production.performance.service.gov.uk' + '/public/dashboards'
+  })
+  .then(function (data) {
+    return JSON.parse(data)['items'];
+  })
+  .then(function (dashboards) {
+    var contentDashboards = dashboards.filter(
+      dashboardType(['content'])
+    ).filter(function(d) {
+      return d['slug'] !== 'site-activity';
+    }).sort(serviceSort);
 
-      var contentDashboards = dashboards.filter(
-        dashboardType(['content'])
-      ).filter(function(d) {
-        return d['slug'] !== 'site-activity';
-      }).sort(serviceSort);
+    var services = dashboards.filter(dashboardType(['transaction', 'other'])).sort(serviceSort);
+    var serviceGroups = dashboards.filter(dashboardType(['service-group'])).sort(serviceSort);;
+    var highVolumeServices = dashboards.filter(dashboardType(['high-volume-transaction'])).sort(serviceSort);;
 
-      var services = dashboards.filter(dashboardType(['transaction', 'other'])).sort(serviceSort);
-      var serviceGroups = dashboards.filter(dashboardType(['service-group'])).sort(serviceSort);;
-      var highVolumeServices = dashboards.filter(dashboardType(['high-volume-transaction'])).sort(serviceSort);;
+    var homepageComponents = require('server/components/homepage');
 
-      var dashboardComponents = require('server/components/homepage');
-
-      // render content
-      var layoutTemplate = loadTemplate(__dirname + '/node_modules/govuk_template_mustache/views/layouts/govuk_template.html');
-      var contentTemplate = loadTemplate(__dirname + '/server/templates/homepage.html');
-      res.send(Mustache.render(layoutTemplate, {
-        assetPath: '/assets/',
-        pageTitle: 'GOV.UK – Performance',
-        content: Mustache.render(contentTemplate, {
-          serviceDashboard: dashboardComponents.ServiceDashboard(services, serviceGroups),
-          overviewDashboard: dashboardComponents.OverviewDashboard(highVolumeServices),
-          activityDashboard: dashboardComponents.ActivityDashboard(contentDashboards)
-        })
-      }));
+    // render content
+    render(res, '/server/templates/homepage.html', {
+      serviceDashboard: homepageComponents.ServiceDashboard(services, serviceGroups),
+      overviewDashboard: homepageComponents.OverviewDashboard(highVolumeServices),
+      activityDashboard: homepageComponents.ActivityDashboard(contentDashboards)
     });
-  }).on('error', function(e) {
+  })
+  .catch(function(e) {
     res.status(500);
   });
 });
@@ -115,6 +109,46 @@ app.get('/performance/*', function (req, res) {
     res.status(500);
   });
 });
+
+function render(res, template, contentOptions) {
+  contentOptions = contentOptions || {};
+
+  var layoutTemplate = loadTemplate(__dirname + '/node_modules/govuk_template_mustache/views/layouts/govuk_template.html');
+  var contentTemplate = loadTemplate(__dirname + template);
+  res.send(Mustache.render(layoutTemplate, {
+    assetPath: '/assets/',
+    pageTitle: 'GOV.UK – Performance',
+    content: Mustache.render(contentTemplate, contentOptions)
+  }));
+}
+
+function requestPromise (options, logger) {
+  var deferred = Q.defer();
+  var log = logger || console;
+  options = options || {};
+
+  if (options.url) {
+    log.info('Making a request to:', options.url);
+
+    request(options, function (err, res, body) {
+      if (err) {
+        return deferred.reject(err);
+      } else if (res.statusCode !== 200) {
+        log.error('Unexpected status code: ' + res.statusCode);
+        err = new Error('Unexpected status code: ' + res.statusCode);
+        err.res = res;
+        return deferred.reject(err);
+      }
+      return deferred.resolve(body);
+    });
+  } else {
+    deferred.reject(
+      new Error('Please provide a url to query')
+    );
+  }
+
+  return deferred.promise;
+};
 
 var server = app.listen(3000, function () {
 

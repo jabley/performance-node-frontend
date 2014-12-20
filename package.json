@@ -9,11 +9,18 @@
     "govuk_template_mustache": "^0.12.0",
     "mustache": "^0.8.2",
     "react": "^0.12.1"
+    "q": "^1.1.2",
+    "react": "^0.12.1",
+    "request": "^2.51.0"
   },
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Government Digital Service",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jabley/performance-node-frontend.git"
+  }
 }
