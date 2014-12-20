@@ -83,11 +83,35 @@ app.get('/performance/*', function (req, res) {
     return JSON.parse(dashboardConfig);
   })
   .then(function (dashboard) {
-    var dashboardComponents = require('server/components/dashboard');
 
-    //render the template
-    render(res, '/server/templates/dashboard.html', {
-      dashboardHeading: dashboardComponents.DashboardHeading(dashboard)
+    var datasources = [],
+      modules = dashboard.modules;
+
+    for (var i = 0, len = modules.length; i < len; i++) {
+      var m = modules[i];
+      if (m.tabs) {
+        for (var j = 0, n = m.tabs.length; j < n; j++) {
+          datasources.push[m.tabs[j]['data-source']];
+        }
+      } else {
+        datasources.push(m['data-source']);
+      }
+    }
+
+    var jobURLs = datasources.map(dataURL);
+
+    backingServiceRequests = jobURLs.map(function (url) {
+      return requestPromise({url: url});
+    })
+
+    Q.allSettled(backingServiceRequests)
+    .then(function (results) {
+      var dashboardComponents = require('server/components/dashboard');
+
+      //render the template
+      render(res, '/server/templates/dashboard.html', {
+        dashboardHeading: dashboardComponents.DashboardHeading(dashboard)
+      });
     });
   })
   .catch(function (error) {
@@ -95,6 +119,57 @@ app.get('/performance/*', function (req, res) {
     res.status(500);
   });
 });
+
+function dataURL(datasource) {
+  var baseURL = 'https://www.performance.service.gov.uk/data/' +
+    datasource['data-group'] + '/' + datasource['data-type'];
+  var qs = queryString(datasource['query-params']);
+  return baseURL + (qs.length > 0 ? '?' + qs : '');
+}
+
+function queryString(queryParams) {
+  var params = [
+    'sort_by',
+    'duration',
+    'period',
+    'limit',
+    'start_at',
+    'end_at',
+  ].map(function (p) {
+    return encodeQueryParam(queryParams, p);
+  }).filter(function (e) {
+    return e.length > 0;
+  });
+
+  var multiParams = [
+    'filter_by',
+    'group_by',
+    'collect',
+  ].map(function (p) {
+    var result = [];
+    if (queryParams.hasOwnProperty(p)) {
+      for (var i = 0, len = queryParams[p].length; i < len; i++) {
+        result.push(p + '=' + queryParams[p][i]);
+      }
+    }
+    return result;
+  }).filter(function (e) {
+    return e.length > 0;
+  });
+
+  for (var i = 0, n = multiParams.length; i < n; i++) {
+    params.push.apply(params, multiParams[i]);
+  }
+
+  return params.join('&');
+}
+
+function encodeQueryParam(queryParams, name) {
+  if (queryParams.hasOwnProperty(name)) {
+    return name + '=' + queryParams[name];
+  }
+  return '';
+}
 
 function render(res, template, contentOptions) {
   contentOptions = contentOptions || {};
