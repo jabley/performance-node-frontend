@@ -132,6 +132,7 @@ function queryString(queryParams) {
     'sort_by',
     'duration',
     'period',
+    'group_by',
     'limit',
     'start_at',
     'end_at',
@@ -147,7 +148,7 @@ function queryString(queryParams) {
     'collect',
   ].map(function (p) {
     var result = [];
-    if (queryParams.hasOwnProperty(p)) {
+    if (queryParams.hasOwnProperty(p) && typeof(queryParams[p] === 'object')) {
       for (var i = 0, len = queryParams[p].length; i < len; i++) {
         result.push(p + '=' + queryParams[p][i]);
       }
@@ -165,7 +166,7 @@ function queryString(queryParams) {
 }
 
 function encodeQueryParam(queryParams, name) {
-  if (queryParams.hasOwnProperty(name)) {
+  if (queryParams.hasOwnProperty(name) && typeof(queryParams[name] !== 'object')) {
     return name + '=' + queryParams[name];
   }
   return '';
