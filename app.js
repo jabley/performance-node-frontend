@@ -3,8 +3,7 @@ var Mustache = require('mustache')
   express = require('express'),
   fs = require('fs'),
   request = require('request')
-  Q = require('q'),
-  $ = require('jquery');
+  Q = require('q');
 
 var app = express();
 app.disable('x-powered-by');
