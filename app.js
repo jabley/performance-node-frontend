@@ -98,10 +98,22 @@ app.get('/performance/*', function (req, res) {
       }
     }
 
-    var jobURLs = datasources.map(dataURL);
+    var jobURLs = datasources.map(dataURL).reduce(function(p, c) {
+        if (p.indexOf(c) < 0) {
+          p.push(c);
+        }
+        return p;
+    }, []);
 
-    backingServiceRequests = jobURLs.map(function (url) {
-      return requestPromise({url: url});
+    var jobs = jobURLs.map(function (url) {
+      return {
+        url: url,
+        rp: requestPromise({url: url})
+      };
+    });
+
+    var backingServiceRequests = jobs.map(function (job) {
+      return job.rp;
     })
 
     Q.allSettled(backingServiceRequests)
