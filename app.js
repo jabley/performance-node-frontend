@@ -122,7 +122,8 @@ app.get('/performance/*', function (req, res) {
 
       //render the template
       render(res, '/server/templates/dashboard.html', {
-        dashboardHeading: dashboardComponents.DashboardHeading(dashboard)
+        dashboardHeading: dashboardComponents.DashboardHeading(dashboard),
+        dashboardFooter: dashboardComponents.DashboardFooter(dashboard)
       });
     });
   })

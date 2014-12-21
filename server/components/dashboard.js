@@ -83,18 +83,7 @@ var DashboardAsideClass = React.createClass({
   render: function() {
     return aside({role: 'complementary'},
       div({className: 'related-pages'},
-        div({
-          className: 'related-transaction',
-          itemScope: 'itemscope',
-          itemProp: 'http://schema.org/GovernmentService'
-        },
-          h3(null, 'Visit this service'),
-          a({
-            itemProp: 'name',
-            href: this.state.dashboard.relatedPages.transaction.url
-          },
-          this.state.dashboard.relatedPages.transaction.title)
-        )
+        DashboardRelatedTransactionComponent({dashboard: this.state.dashboard})
       ),
       div({className: 'big-screen-link-container'},
         h3(null, 'View the dashboard'),
@@ -108,3 +97,65 @@ var DashboardAsideClass = React.createClass({
 })
 
 var DashboardAsideComponent = React.createFactory(DashboardAsideClass);
+
+var DashboardRelatedTransactionClass = React.createClass({
+  // We initialise its state by using the `props` that were passed in when it
+  // was first rendered.
+  getInitialState: function() {
+    return {
+      dashboard: this.props.dashboard
+    }
+  },
+
+  render: function() {
+    return div({
+        className: 'related-transaction',
+        itemScope: 'itemscope',
+        itemProp: 'http://schema.org/GovernmentService'
+      },
+        h3(null, 'Visit this service'),
+        a({
+          itemProp: 'name',
+          href: this.state.dashboard.relatedPages.transaction.url
+        },
+        this.state.dashboard.relatedPages.transaction.title)
+      );
+  }
+});
+
+var DashboardRelatedTransactionComponent = React.createFactory(DashboardRelatedTransactionClass);
+
+var DashboardFooterClass = React.createClass({
+  // We initialise its state by using the `props` that were passed in when it
+  // was first rendered.
+  getInitialState: function() {
+    return {
+      dashboard: this.props.dashboard
+    }
+  },
+
+  render: function() {
+    return footer(null,
+      div({ className: 'row' },
+        p({className: 'description'}, this.state.dashboard.description)
+      ),
+      div({className: 'row'},
+        div({className: 'footer-left'},
+          aside({className: 'related-pages', role: 'complementary'},
+            DashboardRelatedTransactionComponent({dashboard: this.state.dashboard})
+          )
+        ),
+        div({className: 'footer-right'}
+        )
+      )
+    );
+  }
+});
+
+var DashboardFooterComponent = React.createFactory(DashboardFooterClass);
+
+exports.DashboardFooter = function (dashboard) {
+  return React.renderToStaticMarkup(DashboardFooterComponent({
+    dashboard: dashboard
+  }));
+};
