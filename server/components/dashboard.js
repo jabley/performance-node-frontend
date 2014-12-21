@@ -1,23 +1,24 @@
 var React = require('react'),
   DOM = React.DOM,
+  a = DOM.a,
   aside = DOM.aside,
+  dd = DOM.dd,
   div = DOM.div,
+  dl = DOM.dl,
+  dt = DOM.dt,
+  footer = DOM.footer,
   h1 = DOM.h1,
   h2 = DOM.h2,
   h3 = DOM.h3,
-  section = DOM.section,
-  p = DOM.p,
-  ul = DOM.ul,
-  li = DOM.li,
-  a = DOM.a,
-  dt = DOM.dt,
-  dl = DOM.dl,
-  dd = DOM.dd,
   header = DOM.header,
+  li = DOM.li,
   main = DOM.main,
   ol = DOM.ol,
+  p = DOM.p,
+  section = DOM.section,
   span = DOM.span,
-  strong = DOM.strong;
+  strong = DOM.strong,
+  ul = DOM.ul;
 
 var DashboardHeadingClass = React.createClass({
   // We initialise its state by using the `props` that were passed in when it
