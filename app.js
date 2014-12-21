@@ -150,7 +150,10 @@ function queryString(queryParams) {
     'start_at',
     'end_at',
   ].map(function (p) {
-    return encodeQueryParam(queryParams, p);
+    if (queryParams.hasOwnProperty(p) && typeof(queryParams[p]) !== 'object') {
+      return p + '=' + queryParams[p];
+    }
+    return '';
   }).filter(function (e) {
     return e.length > 0;
   });
@@ -176,13 +179,6 @@ function queryString(queryParams) {
   }
 
   return params.join('&');
-}
-
-function encodeQueryParam(queryParams, name) {
-  if (queryParams.hasOwnProperty(name) && typeof(queryParams[name]) !== 'object') {
-    return name + '=' + queryParams[name];
-  }
-  return '';
 }
 
 function render(res, template, contentOptions) {
