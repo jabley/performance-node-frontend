@@ -160,7 +160,7 @@ function queryString(queryParams) {
     'collect',
   ].map(function (p) {
     var result = [];
-    if (queryParams.hasOwnProperty(p) && typeof(queryParams[p] === 'object')) {
+    if (queryParams.hasOwnProperty(p) && typeof(queryParams[p]) === 'object') {
       for (var i = 0, len = queryParams[p].length; i < len; i++) {
         result.push(p + '=' + queryParams[p][i]);
       }
@@ -178,7 +178,7 @@ function queryString(queryParams) {
 }
 
 function encodeQueryParam(queryParams, name) {
-  if (queryParams.hasOwnProperty(name) && typeof(queryParams[name] !== 'object')) {
+  if (queryParams.hasOwnProperty(name) && typeof(queryParams[name]) !== 'object') {
     return name + '=' + queryParams[name];
   }
   return '';
