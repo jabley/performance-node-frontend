@@ -196,8 +196,9 @@ function requestPromise (options, logger) {
       if (err) {
         return deferred.reject(err);
       } else if (res.statusCode !== 200) {
-        log.error('Unexpected status code: ' + res.statusCode);
-        err = new Error('Unexpected status code: ' + res.statusCode);
+        var msg = 'Unexpected status code: ' + res.statusCode + ' <' + options.url + '>';
+        log.error(msg);
+        err = new Error(msg);
         err.res = res;
         return deferred.reject(err);
       }
