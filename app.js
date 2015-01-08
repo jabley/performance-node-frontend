@@ -83,7 +83,7 @@ app.get('/performance/*', function (req, res) {
   })
   .then(function (dashboard) {
 
-    var datasources = [],
+    var datasources = [], // A array of all backing services to talk to
       modules = dashboard.modules;
 
     for (var i = 0, len = modules.length; i < len; i++) {
@@ -97,6 +97,7 @@ app.get('/performance/*', function (req, res) {
       }
     }
 
+    // Remove duplicate requests to backing services
     var jobURLs = datasources.map(dataURL).reduce(function(p, c) {
         if (p.indexOf(c) < 0) {
           p.push(c);
@@ -104,6 +105,7 @@ app.get('/performance/*', function (req, res) {
         return p;
     }, []);
 
+    // Provide a way of mapping URLs to results
     var jobs = jobURLs.map(function (url) {
       return {
         url: url,
@@ -111,10 +113,12 @@ app.get('/performance/*', function (req, res) {
       };
     });
 
+    // Want an array of promises to play with
     var backingServiceRequests = jobs.map(function (job) {
       return job.rp;
     })
 
+    // Wait for all the promises to complete
     Q.allSettled(backingServiceRequests)
     .then(function (results) {
       var dashboardComponents = require('server/components/dashboard');
