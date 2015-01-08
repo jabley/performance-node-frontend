@@ -143,7 +143,20 @@ function dataURL(datasource) {
   return baseURL + (qs.length > 0 ? '?' + qs : '');
 }
 
+var PERIOD_TO_DURATION = {
+  hour: 24,
+  day: 30,
+  week: 9,
+  month: 12,
+  quarter: 24
+};
+
 function queryString(queryParams) {
+  if (queryParams.period && !queryParams.duration &&
+    !(queryParams.start_at && queryParams.end_at)) {
+      queryParams.duration = PERIOD_TO_DURATION[queryParams.period];
+  }
+
   var params = [
     'sort_by',
     'duration',
