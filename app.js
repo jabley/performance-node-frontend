@@ -202,10 +202,15 @@ function render(res, template, contentOptions) {
 
   var layoutTemplate = loadTemplate(__dirname + '/node_modules/govuk_template_mustache/views/layouts/govuk_template.html');
   var contentTemplate = loadTemplate(__dirname + template);
+  var footerTopTemplate = loadTemplate(__dirname + '/server/templates/common/footer-top.html');
+  var footerSupportLinksTemplate = loadTemplate(__dirname + '/server/templates/common/footer-support-links.html');
+
   res.send(Mustache.render(layoutTemplate, {
     assetPath: '/assets/',
     pageTitle: 'GOV.UK – Performance',
-    content: Mustache.render(contentTemplate, contentOptions)
+    content: Mustache.render(contentTemplate, contentOptions),
+    footerTop: footerTopTemplate,
+    footerSupportLinks: footerSupportLinksTemplate
   }));
 }
 
